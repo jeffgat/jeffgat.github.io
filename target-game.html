@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>whack-a-mole</title>
+    <link rel="stylesheet" href="assets/css/fontawesome-all.min.css" />
+    <link rel="stylesheet" href="./assets/css/target-game.css" />
+  </head>
+  <body>
+    <a class="back-arrow" href="/">
+      <i class="go-back fas fa-arrow-left"></i>Go Back
+    </a>
+    <div class="page__container">
+      <div class="heading__wrapper">
+        <img src="./images/target-heading.svg" alt="" />
+        <h1>Target Practice</h1>
+        <p>
+          Your standard whack-a-mole game.. However, if you click on anything
+          that isn't a target, you get a -1
+        </p>
+        <button class="start__button" onClick="startGame()">Start Game</button>
+      </div>
+
+      <div class="score__wrapper">
+        Your Score:
+        <div class="score">0</div>
+      </div>
+
+      <div class="game">
+        <div class="hole hole1">
+          <div class="target t-red"></div>
+        </div>
+        <div class="hole hole2">
+          <div class="target t-blue"></div>
+        </div>
+        <div class="hole hole3">
+          <div class="target t-purple"></div>
+        </div>
+        <div class="hole hole4">
+          <div class="target t-purple"></div>
+        </div>
+        <div class="hole hole5">
+          <div class="target t-red"></div>
+        </div>
+        <div class="hole hole6">
+          <div class="target t-blue"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const holes = document.querySelectorAll(".hole");
+      const scoreBoard = document.querySelector(".score");
+      const targets = document.querySelectorAll(".target");
+      let lastHole;
+      let score = 0;
+      timeUp = false;
+
+      function randomTime(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      function randomHole(holes) {
+        const idx = Math.floor(Math.random() * holes.length);
+        const hole = holes[idx];
+        if (hole === lastHole) {
+          console.log("same one bud");
+          return randomHole(holes);
+        }
+        lastHole = hole;
+        return hole;
+      }
+
+      function peakOut() {
+        const time = randomTime(400, 1000);
+        const hole = randomHole(holes);
+        hole.classList.add("up");
+        setTimeout(() => {
+          hole.classList.remove("up");
+          if (!timeUp) peakOut();
+        }, time);
+      }
+
+      function startGame() {
+        scoreBoard.textContent = 0;
+        score = 1;
+        timeUp = false;
+        peakOut();
+        setTimeout(() => (timeUp = true), 10000);
+      }
+
+      function scoreIncrease(e) {
+        if (!e.isTrusted) return; // fake clicks
+        if (this.parentNode.classList.contains("up"))
+          // add one point per click
+          score += 2;
+        this.parentNode.classList.remove("up");
+        scoreBoard.textContent = score;
+      }
+
+      function scoreDecrease(e) {
+        if (!e.isTrusted) return;
+        score--;
+        scoreBoard.textContent = score;
+      }
+
+      targets.forEach(target =>
+        target.addEventListener("click", scoreIncrease)
+      );
+      document.addEventListener("click", scoreDecrease);
+
+      // add difficulty
+      // add high score in local storage
+      // make it look cooler
+    </script>
+  </body>
+</html>
